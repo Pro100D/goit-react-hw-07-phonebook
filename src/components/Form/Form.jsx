@@ -8,8 +8,8 @@ import {
   FormButtonSubmit,
 } from './Form.styled';
 import { useDispatch, useSelector } from 'react-redux';
-import { addContact } from 'redux/contactSlice';
 import { contactsSelector } from 'redux/selectors';
+import { addContactPost } from 'redux/operations';
 
 const Form = () => {
   const [name, setName] = useState('');
@@ -52,10 +52,10 @@ const Form = () => {
     const newContact = {
       id: shortid.generate(),
       name: nameInputValue,
-      number: numberInputValue,
+      phone: numberInputValue,
     };
 
-    dispatch(addContact(newContact));
+    dispatch(addContactPost(newContact));
 
     reset();
   };
@@ -79,7 +79,7 @@ const Form = () => {
         id="name"
       />
 
-      <FormLeable htmlFor="number">Number</FormLeable>
+      <FormLeable htmlFor="number">Phone</FormLeable>
       <FormInput
         type="tel"
         name="number"

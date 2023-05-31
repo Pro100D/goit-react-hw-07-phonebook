@@ -1,5 +1,3 @@
-// import { useSelector } from 'react-redux';
-
 const { createSlice } = require('@reduxjs/toolkit');
 
 const filterinitialState = '';

@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   ListContact,
@@ -5,36 +6,49 @@ import {
   ListContactInfo,
   ListRemoveBtn,
 } from './ContactList.styled';
-import { deleteContact } from 'redux/contactSlice';
-import { contactsSelector, filterSelector } from 'redux/selectors';
+import {
+  contactsSelector,
+  filterSelector,
+  selectIsLoading,
+} from 'redux/selectors';
+import { deleteContact, fetchContacts } from 'redux/operations';
 
 const ConatctList = () => {
   const contacts = useSelector(contactsSelector);
-  console.log(contacts);
-
   const filters = useSelector(filterSelector);
+  const isLoad = useSelector(selectIsLoading);
 
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchContacts());
+  }, [dispatch]);
 
   const filtredListContact = contacts.filter(contact =>
     contact.name.toLocaleLowerCase().includes(filters.toLocaleLowerCase())
   );
   return (
-    <ListContact>
-      {filtredListContact.map(contact => (
-        <ListContactItem key={contact.id}>
-          <ListContactInfo>
-            {contact.name}: {contact.number}
-          </ListContactInfo>
-          <ListRemoveBtn
-            type="button"
-            onClick={() => dispatch(deleteContact(contact.id))}
-          >
-            remove
-          </ListRemoveBtn>
-        </ListContactItem>
-      ))}
-    </ListContact>
+    <>
+      {isLoad ? (
+        <h2>please wait loading...</h2>
+      ) : (
+        <ListContact>
+          {filtredListContact.map(contact => (
+            <ListContactItem key={contact.id}>
+              <ListContactInfo>
+                {contact.name}: {contact.phone}
+              </ListContactInfo>
+              <ListRemoveBtn
+                type="button"
+                onClick={() => dispatch(deleteContact(contact.id))}
+              >
+                remove
+              </ListRemoveBtn>
+            </ListContactItem>
+          ))}
+        </ListContact>
+      )}
+    </>
   );
 };
 
