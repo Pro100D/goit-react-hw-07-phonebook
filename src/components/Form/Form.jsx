@@ -1,4 +1,5 @@
 import shortid from 'shortid';
+import Notiflix from 'notiflix';
 import { useState } from 'react';
 
 import {
@@ -7,15 +8,14 @@ import {
   FormLeable,
   FormButtonSubmit,
 } from './Form.styled';
-import { useDispatch, useSelector } from 'react-redux';
-import { contactsSelector } from 'redux/selectors';
-import { addContactPost } from 'redux/operations';
+import { useAddContactMutation, useGetContactsQuery } from 'redux/contactSlice';
 
 const Form = () => {
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
 
-  const contacts = useSelector(contactsSelector);
+  const { data: contacts } = useGetContactsQuery();
+  const [addContact] = useAddContactMutation();
 
   const handleChange = evt => {
     const { name, value } = evt.currentTarget;
@@ -33,7 +33,6 @@ const Form = () => {
         return;
     }
   };
-  const dispatch = useDispatch();
   const handleSubmit = evt => {
     evt.preventDefault();
 
@@ -45,7 +44,7 @@ const Form = () => {
     );
 
     if (checkContact) {
-      window.alert(`${nameInputValue} is already in contacts.`);
+      Notiflix.Notify.failure(`${nameInputValue} is already in contacts.`);
       return;
     }
 
@@ -55,7 +54,8 @@ const Form = () => {
       phone: numberInputValue,
     };
 
-    dispatch(addContactPost(newContact));
+    addContact(newContact);
+    Notiflix.Notify.success(`${nameInputValue} added to contact list.`);
 
     reset();
   };

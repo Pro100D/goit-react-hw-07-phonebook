@@ -1,53 +1,44 @@
-import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
+
+import { filterSelector } from 'redux/selectors';
+import {
+  useGetContactsQuery,
+  useDeleteContactsMutation,
+} from 'redux/contactSlice';
+
 import {
   ListContact,
   ListContactItem,
   ListContactInfo,
   ListRemoveBtn,
 } from './ContactList.styled';
-import {
-  contactsSelector,
-  filterSelector,
-  selectIsLoading,
-} from 'redux/selectors';
-import { deleteContact, fetchContacts } from 'redux/operations';
 
 const ConatctList = () => {
-  const contacts = useSelector(contactsSelector);
   const filters = useSelector(filterSelector);
-  const isLoad = useSelector(selectIsLoading);
 
-  const dispatch = useDispatch();
+  const { data: contacts, error, isLoading } = useGetContactsQuery();
+  const [deletePost] = useDeleteContactsMutation();
 
-  useEffect(() => {
-    dispatch(fetchContacts());
-  }, [dispatch]);
-
+  if (!contacts) return;
   const filtredListContact = contacts.filter(contact =>
     contact.name.toLocaleLowerCase().includes(filters.toLocaleLowerCase())
   );
   return (
     <>
-      {isLoad ? (
-        <h2>please wait loading...</h2>
-      ) : (
-        <ListContact>
-          {filtredListContact.map(contact => (
-            <ListContactItem key={contact.id}>
-              <ListContactInfo>
-                {contact.name}: {contact.phone}
-              </ListContactInfo>
-              <ListRemoveBtn
-                type="button"
-                onClick={() => dispatch(deleteContact(contact.id))}
-              >
-                remove
-              </ListRemoveBtn>
-            </ListContactItem>
-          ))}
-        </ListContact>
-      )}
+      {error && <h1>Not Faund:(</h1>}
+      {isLoading && <h2>please wait loading...</h2>}
+      <ListContact>
+        {filtredListContact.map(({ id, name, phone }) => (
+          <ListContactItem key={id}>
+            <ListContactInfo>
+              {name}: {phone}
+            </ListContactInfo>
+            <ListRemoveBtn type="button" onClick={() => deletePost(id)}>
+              remove
+            </ListRemoveBtn>
+          </ListContactItem>
+        ))}
+      </ListContact>
     </>
   );
 };
